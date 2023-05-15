@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog
 from PyQt5.QtCore import pyqtSlot
 from views.main_view_ui import Ui_MainWindow
 import qdarkstyle
@@ -23,7 +23,7 @@ class MainView(QMainWindow):
         self._model.simulation_file_changed.connect(self.on_simulation_file_changed)
         self._model.dark_mode_changed.connect(self.on_dark_mode_changed)
 
-        self._ui.actionEdit_Signal.trggered.connect(self._edit_signal)
+        self._ui.actionEdit_Signal.triggered.connect(self._edit_signal)
 
     @pyqtSlot(str)
     def on_simulation_file_changed(self, value):
@@ -55,5 +55,6 @@ class MainView(QMainWindow):
             self.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5', palette=palette))
 
     def _edit_signal(self):
-        self._signal_editor = SignalEditor()
+        # self._signal_editor = SignalEditor()
+        self._siglal_editor = QDialog(parent=self)
         self._signal_editor.show()
