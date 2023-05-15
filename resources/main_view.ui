@@ -17,14 +17,31 @@
    <iconset resource="resource.qrc">
     <normaloff>:/resources/img/app_icon.ico</normaloff>:/resources/img/app_icon.ico</iconset>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>190</y>
+      <width>411</width>
+      <height>281</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>18</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -35,6 +52,8 @@
     <addaction name="actionOpen_Geometry"/>
     <addaction name="actionReload"/>
     <addaction name="actionClose"/>
+    <addaction name="actionSave_Simulation"/>
+    <addaction name="actionSave_Geometry"/>
    </widget>
    <widget class="QMenu" name="menuSetting">
     <property name="title">
@@ -46,7 +65,7 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionEdit"/>
+    <addaction name="actionEdit_Signal"/>
     <addaction name="actionEdit_Road"/>
     <addaction name="actionEdit_Ped"/>
     <addaction name="actionEdit_Ped_Crossing"/>
@@ -64,7 +83,7 @@
   </action>
   <action name="actionOpen_Geometry">
    <property name="text">
-    <string>Open  Geometry</string>
+    <string>Open Geometry</string>
    </property>
   </action>
   <action name="actionReload">
@@ -77,7 +96,7 @@
     <string>Close</string>
    </property>
   </action>
-  <action name="actionEdit">
+  <action name="actionEdit_Signal">
    <property name="text">
     <string>Edit Signal</string>
    </property>
@@ -105,6 +124,16 @@
   <action name="actionToggle_Dark_Mode">
    <property name="text">
     <string>Toggle Dark Mode</string>
+   </property>
+  </action>
+  <action name="actionSave_Simulation">
+   <property name="text">
+    <string>Save Simulation</string>
+   </property>
+  </action>
+  <action name="actionSave_Geometry">
+   <property name="text">
+    <string>Save Geometry</string>
    </property>
   </action>
  </widget>

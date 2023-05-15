@@ -1,0 +1,4 @@
+- [ ] list simulation specs
+- [ ] simulation and geometry file spec
+- [ ] canvas ui
+- [ ] signal setting ui

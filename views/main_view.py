@@ -18,10 +18,12 @@ class MainView(QMainWindow):
 
         # connect widgets to controller
         self._ui.actionToggle_Dark_Mode.triggered.connect(self._main_controller.toggle_dark_mode)
-        
+
         # listen for model event signals
         self._model.simulation_file_changed.connect(self.on_simulation_file_changed)
         self._model.dark_mode_changed.connect(self.on_dark_mode_changed)
+
+        self._ui.actionEdit_Signal.trggered.connect(self._edit_signal)
 
     @pyqtSlot(str)
     def on_simulation_file_changed(self, value):
@@ -51,3 +53,7 @@ class MainView(QMainWindow):
             palette = qdarkstyle.Palette()
             palette.ID = "light"
             self.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5', palette=palette))
+
+    def _edit_signal(self):
+        self._signal_editor = SignalEditor()
+        self._signal_editor.show()

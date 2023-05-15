@@ -2,7 +2,12 @@ from PyQt5.QtCore import QObject, pyqtSignal
 import os
 
 class MainModel(QObject):
-
+    """
+    contains the data of the application:
+    - geometry_file: path to the geometry file
+    - simulation_file: path to the simulation file
+    - dark_mode: True if dark mode is enabled
+    """
     gemoetry_file_changed = pyqtSignal(str)
     simulation_file_changed = pyqtSignal(str)
     dark_mode_changed = pyqtSignal(bool)

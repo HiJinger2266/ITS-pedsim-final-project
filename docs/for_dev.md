@@ -126,3 +126,8 @@ compile
 ```bash
 pyrcc5 -o resource_rc.py resources/resource.qrc
 ```
+
+compile ui
+```bash
+pyuic5 -o views/main_view_ui.py resources/main_view.ui
+```

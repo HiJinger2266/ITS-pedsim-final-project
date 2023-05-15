@@ -7,9 +7,10 @@ from views.main_view import MainView
 class App(QApplication):
     def __init__(self, sys_argv):
         super(App, self).__init__(sys_argv)
-        self.model = MainModel()
-        self.main_controller = MainController(self.model)
-        self.main_view = MainView(self.model, self.main_controller)
+        # main_model
+        self.main_model = MainModel()
+        self.main_controller = MainController(self.main_model)
+        self.main_view = MainView(self.main_model, self.main_controller)
         self.main_view.show()
 
 if __name__ == '__main__':
