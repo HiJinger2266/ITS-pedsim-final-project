@@ -1,4 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSlot
+from model.enums import FileState
+import os
 
 class MainController(QObject):
     def __init__(self, model):
@@ -8,8 +10,29 @@ class MainController(QObject):
 
     @pyqtSlot(bool)
     def open_simulation_file(self, value):
-        print(value)
+        """
+        connect with main_view action_open_triggered
+        """
+        # validate file path
+        if not os.path.isfile(value):
+            raise FileNotFoundError(f'File not found: {value}')
+        # set simulation file path
         self._model.simulation_file = value
+        # set simulation file status
+        self._model.simulation_file_status = FileState.UNCHANGED
+
+    @pyqtSlot(bool)
+    def open_temp_simulation_file(self, value):
+        """
+        connect with main_view action_open_temp_triggered
+        """
+        # validate file path
+        if not os.path.isfile(value):
+            raise FileNotFoundError(f'File not found: {value}')
+        # set simulation file path
+        self._model.simulation_file = value
+        # set simulation file status
+        self._model.simulation_file_status = FileState.NEW
 
     @pyqtSlot(bool)
     def toggle_dark_mode(self, value):

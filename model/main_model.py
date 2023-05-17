@@ -1,38 +1,24 @@
 from PyQt5.QtCore import QObject, pyqtSignal
-import os
+from model.enums import FileState
 
 class MainModel(QObject):
     """
     contains the data of the application:
-    - geometry_file: path to the geometry file
-    - simulation_file: path to the simulation file
+    - simulation_file_path: path to the simulation file
     - dark_mode: True if dark mode is enabled
     """
-    gemoetry_file_changed = pyqtSignal(str)
-    simulation_file_changed = pyqtSignal(str)
+    simulation_file_path_changed = pyqtSignal(str)
+    simulation_file_status_changed = pyqtSignal(FileState)
     dark_mode_changed = pyqtSignal(bool)
 
     @property
-    def geometry_file(self):
-        return self._geometry_file
+    def simulation_file_path(self):
+        return self._simulation_file_path
     
-    @geometry_file.setter
-    def geometry_file(self, value):
-        if not os.path.isfile(value):
-            raise FileNotFoundError(f'File not found: {value}')
-        self._geometry_file = value
-        self.gemoetry_file_changed.emit(value)
-
-    @property
-    def simulation_file(self):
-        return self._simulation_file
-    
-    @simulation_file.setter
-    def simulation_file(self, value):
-        if not os.path.isfile(value):
-            raise FileNotFoundError(f'File not found: {value}')
-        self._simulation_file = value
-        self.simulation_file_changed.emit(value)
+    @simulation_file_path.setter
+    def simulation_file_path(self, value):
+        self._simulation_file_path = value
+        self.simulation_file_path_changed.emit(value)
 
     @property
     def dark_mode(self):
@@ -43,8 +29,17 @@ class MainModel(QObject):
         self._dark_mode = value
         self.dark_mode_changed.emit(value)
 
+    @property
+    def simulation_file_status(self):
+        return self._simulation_file_status
+    
+    @simulation_file_status.setter
+    def simulation_file_status(self, value):
+        self._simulation_file_status = value
+        self.simulation_file_status_changed.emit(value)
+
     def __init__(self):
         super().__init__()
         self._geometry_file = None
-        self._simulation_file = None
+        self._simulation_file_path = ''
         self._dark_mode = False
