@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot, QSettings
 from model.enums import FileState
 import os
 
@@ -7,6 +7,7 @@ class MainController(QObject):
         super().__init__()
 
         self._model = model
+        self._settings = QSettings('NTU', 'PedSim')
 
     @pyqtSlot(bool)
     def open_simulation_file(self, value):
@@ -37,3 +38,4 @@ class MainController(QObject):
     @pyqtSlot(bool)
     def toggle_dark_mode(self, value):
         self._model.dark_mode = not self._model.dark_mode
+        self._settings.setValue('dark_mode', self._model.dark_mode)

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PedSim</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resource.qrc">
+    <normaloff>:/resources/img/app_icon.ico</normaloff>:/resources/img/app_icon.ico</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QFrame" name="frame">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_new"/>
+    <addaction name="action_open"/>
+    <addaction name="action_save"/>
+    <addaction name="action_close"/>
+    <addaction name="action_reload"/>
+   </widget>
+   <widget class="QMenu" name="menuSetting">
+    <property name="title">
+     <string>Setting</string>
+    </property>
+    <addaction name="action_toggle_dark_mode"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <widget class="QMenu" name="menuEdit_Geometry">
+     <property name="title">
+      <string>Edit Geometry</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../img/geometry.svg</normaloff>../img/geometry.svg</iconset>
+     </property>
+     <widget class="QMenu" name="menuRoad">
+      <property name="title">
+       <string>Road</string>
+      </property>
+      <addaction name="action_edit_road"/>
+      <addaction name="action_add_road"/>
+      <addaction name="action_remove_road"/>
+     </widget>
+     <widget class="QMenu" name="menuBoundary">
+      <property name="title">
+       <string>Boundary</string>
+      </property>
+      <addaction name="action_edit_bound"/>
+      <addaction name="action_add_bound"/>
+      <addaction name="action_remove_bound"/>
+     </widget>
+     <addaction name="menuRoad"/>
+     <addaction name="menuBoundary"/>
+    </widget>
+    <addaction name="action_edit_signal"/>
+    <addaction name="action_edit_agents"/>
+    <addaction name="action_edit_simulation"/>
+    <addaction name="menuEdit_Geometry"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars">
+     <property name="title">
+      <string>Toolbars</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../img/toolbar.svg</normaloff>../img/toolbar.svg</iconset>
+     </property>
+     <addaction name="action_toggle_toolbar_file"/>
+     <addaction name="action_toggle_toolbar_edit"/>
+     <addaction name="action_toggle_toolbar_view"/>
+     <addaction name="action_toggle_toolbar_settings"/>
+    </widget>
+    <addaction name="action_pan"/>
+    <addaction name="action_pointer"/>
+    <addaction name="action_fit"/>
+    <addaction name="menuToolbars"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuSetting"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_open">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/open.svg</normaloff>../img/open.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actio_open_geometry">
+   <property name="text">
+    <string>Open Geometry</string>
+   </property>
+  </action>
+  <action name="action_reload">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/reload.svg</normaloff>../img/reload.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Reload</string>
+   </property>
+  </action>
+  <action name="action_close">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/close.svg</normaloff>../img/close.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="action_edit_signal">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/signal.svg</normaloff>../img/signal.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Signal</string>
+   </property>
+  </action>
+  <action name="actionEdit_Road">
+   <property name="text">
+    <string>Edit Road</string>
+   </property>
+  </action>
+  <action name="actionEdit_Ped">
+   <property name="text">
+    <string>Edit Bike Lane</string>
+   </property>
+  </action>
+  <action name="actionEdit_Ped_Crossing">
+   <property name="text">
+    <string>Edit Ped Crossing</string>
+   </property>
+  </action>
+  <action name="actionEdit_Sep_Island">
+   <property name="text">
+    <string>Edit Sep Island</string>
+   </property>
+  </action>
+  <action name="action_toggle_dark_mode">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/dark_mode.svg</normaloff>../img/dark_mode.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Dark Mode</string>
+   </property>
+  </action>
+  <action name="action_save">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/save.svg</normaloff>../img/save.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="action_save_geometry">
+   <property name="text">
+    <string>Save Geometry</string>
+   </property>
+  </action>
+  <action name="action_new">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/new.svg</normaloff>../img/new.svg</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="action_edit_agents">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/agent.svg</normaloff>../img/agent.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Agents</string>
+   </property>
+  </action>
+  <action name="action_edit_simulation">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/simulation.svg</normaloff>../img/simulation.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Simulation</string>
+   </property>
+  </action>
+  <action name="action_bike_boundary">
+   <property name="text">
+    <string>Bike Boundary</string>
+   </property>
+  </action>
+  <action name="action_edit_road">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/edit.svg</normaloff>../img/edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="action_add_road">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/add.svg</normaloff>../img/add.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="action_remove_road">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/remove.svg</normaloff>../img/remove.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="action_edit_bound">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/edit.svg</normaloff>../img/edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="action_add_bound">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/add.svg</normaloff>../img/add.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="action_remove_bound">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/remove.svg</normaloff>../img/remove.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="action_pan">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/pan.svg</normaloff>../img/pan.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Pan</string>
+   </property>
+  </action>
+  <action name="action_pointer">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/pointer.svg</normaloff>../img/pointer.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Pointer</string>
+   </property>
+  </action>
+  <action name="action_toggle_toolbar_file">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>File</string>
+   </property>
+  </action>
+  <action name="action_toggle_toolbar_edit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="action_toggle_toolbar_view">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>View</string>
+   </property>
+  </action>
+  <action name="action_toggle_toolbar_settings">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Setting</string>
+   </property>
+  </action>
+  <action name="action_fit">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/fit.svg</normaloff>../img/fit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>fit</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'resources/signal_editor.ui'
+# Form implementation generated from reading ui file './resources/ui/signal_editor.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
