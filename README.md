@@ -13,7 +13,6 @@
 待補
 
 ## 安裝說明
-
 ```bash
 git clone
 pip install -r requirements.txt
@@ -28,3 +27,9 @@ python main.py
 ## 使用範例
 
 待補
+
+## 套件
+```bash
+pip install PyQt5
+pip install QDarkStyle
+```

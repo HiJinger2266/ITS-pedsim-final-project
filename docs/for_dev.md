@@ -70,6 +70,7 @@ conda create -n <env_name> python=3.9
 activate environment:  
 ```bash
 conda activate <env_name>
+#conda activate ITSfinal
 ```
 install requirements:  
 ```bash
