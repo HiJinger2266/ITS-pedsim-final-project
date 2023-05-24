@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile_ui",
+            "type": "process",
+            "command": "compile_ui.sh",
+            "windows": {
+                "command": "compile_ui.bat"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

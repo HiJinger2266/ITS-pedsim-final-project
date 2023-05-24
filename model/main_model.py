@@ -1,5 +1,9 @@
+from typing import List
 from PyQt5.QtCore import QObject, pyqtSignal
-from model.enums import FileState
+import pandas as pd
+from model.enums import FileState, CursorMode
+from model.table_models import PolygonsTableModel
+from views.canvas_items import PolygonItem
 
 class MainModel(QObject):
     """
@@ -10,6 +14,12 @@ class MainModel(QObject):
     simulation_file_path_changed = pyqtSignal(str)
     simulation_file_status_changed = pyqtSignal(FileState)
     dark_mode_changed = pyqtSignal(bool)
+    cursor_mode_changed = pyqtSignal(CursorMode)
+    statusBar_message_changed = pyqtSignal(str)
+    boundaries_changed = pyqtSignal(list)
+    origins_changed = pyqtSignal(list)
+    destinations_changed = pyqtSignal(list)
+    background_changed = pyqtSignal()
 
     @property
     def simulation_file_path(self):
@@ -38,8 +48,92 @@ class MainModel(QObject):
         self._simulation_file_status = value
         self.simulation_file_status_changed.emit(value)
 
+    @property
+    def cursor_mode(self):
+        return self._cursor_mode
+    
+    @cursor_mode.setter
+    def cursor_mode(self, value):
+        self._cursor_mode = value
+        self.cursor_mode_changed.emit(value)
+        print('cursor_mode changed', value)
+
+    @property
+    def statusBar_message(self):
+        return self._statusBar_message
+    
+    @statusBar_message.setter
+    def statusBar_message(self, value):
+        self._statusBar_message = value
+        self.statusBar_message_changed.emit(value)
+
+    @property
+    def boundaries(self):
+        return self._boundaries
+    
+    @boundaries.setter
+    def boundaries(self, value):
+        self._boundaries = value
+        if value is not None:
+            self.boundaries_changed.emit(value)
+            self._boundaries_table_model.updateData(value)
+
+    @property
+    def origins(self):
+        return self._origins
+    
+    @origins.setter
+    def origins(self, value):
+        self._origins = value
+        if value is not None:
+            self.origins_changed.emit(value)
+            self._origins_table_model.updateData(value)
+
+    @property
+    def destinations(self):
+        return self._destinations
+    
+    @destinations.setter
+    def destinations(self, value):
+        self._destinations = value
+        if value is not None:
+            self.destinations_changed.emit(value)
+            self._destinations_table_model.updateData(value)
+
+    @property
+    def boundaries_table_model(self):
+        return self._boundaries_table_model
+
+    @property
+    def origins_table_model(self):
+        return self._origins_table_model
+    
+    @property
+    def destinations_table_model(self):
+        return self._destinations_table_model
+
+    @property
+    def background(self):
+        return self._background
+    
+    @background.setter
+    def background(self, value):
+        self._background = value
+        self.background_changed.emit()
+
     def __init__(self):
         super().__init__()
         self._geometry_file = None
         self._simulation_file_path = ''
         self._dark_mode = False
+        self._simulation_file_status = FileState.UNCHANGED
+        self._cursor_mode = CursorMode.POINTER
+        self._statusBar_message = 'Ready'
+        self._boundaries = None
+        self._origins = None
+        self._destinations = None
+        self._boundaries_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
+        self._origins_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
+        self._destinations_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
+        self._background = None
+

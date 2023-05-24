@@ -6,9 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
+  </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
   </property>
   <property name="windowTitle">
    <string>PedSim</string>
@@ -20,15 +23,9 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QFrame" name="frame">
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+     <widget class="QGraphicsView" name="canvas">
+      <property name="mouseTracking">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -39,7 +36,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1280</width>
      <height>22</height>
     </rect>
    </property>
@@ -52,6 +49,7 @@
     <addaction name="action_save"/>
     <addaction name="action_close"/>
     <addaction name="action_reload"/>
+    <addaction name="action_background"/>
    </widget>
    <widget class="QMenu" name="menuSetting">
     <property name="title">
@@ -89,6 +87,8 @@
      </widget>
      <addaction name="menuRoad"/>
      <addaction name="menuBoundary"/>
+     <addaction name="action_edit_origin"/>
+     <addaction name="action_edit_destination"/>
     </widget>
     <addaction name="action_edit_signal"/>
     <addaction name="action_edit_agents"/>
@@ -111,18 +111,62 @@
      <addaction name="action_toggle_toolbar_edit"/>
      <addaction name="action_toggle_toolbar_view"/>
      <addaction name="action_toggle_toolbar_settings"/>
+     <addaction name="action_toggle_toolbar_run"/>
     </widget>
     <addaction name="action_pan"/>
     <addaction name="action_pointer"/>
     <addaction name="action_fit"/>
     <addaction name="menuToolbars"/>
    </widget>
+   <widget class="QMenu" name="menuRun">
+    <property name="title">
+     <string>Run</string>
+    </property>
+    <addaction name="action_start"/>
+    <addaction name="action_pause"/>
+    <addaction name="action_stop"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSetting"/>
+   <addaction name="menuRun"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>Objects</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="1" column="0">
+      <widget class="QTableView" name="tableView"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QComboBox" name="comboBox">
+       <item>
+        <property name="text">
+         <string>boundaries</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>origin</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>destination</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="action_open">
    <property name="icon">
     <iconset>
@@ -269,7 +313,7 @@
   <action name="action_edit_bound">
    <property name="icon">
     <iconset>
-     <normaloff>../img/edit.svg</normaloff>../img/edit.svg</iconset>
+     <normaloff>../img/edit_boundary.svg</normaloff>../img/edit_boundary.svg</iconset>
    </property>
    <property name="text">
     <string>Edit</string>
@@ -362,6 +406,65 @@
    </property>
    <property name="text">
     <string>fit</string>
+   </property>
+  </action>
+  <action name="action_start">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/start.svg</normaloff>../img/start.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="action_pause">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/pause.svg</normaloff>../img/pause.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="action_stop">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/stop.svg</normaloff>../img/stop.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="action_toggle_toolbar_run">
+   <property name="text">
+    <string>run</string>
+   </property>
+  </action>
+  <action name="action_edit_origin">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/edit_origin.svg</normaloff>../img/edit_origin.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Origin</string>
+   </property>
+  </action>
+  <action name="action_edit_destination">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/edit_destination.svg</normaloff>../img/edit_destination.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Destination</string>
+   </property>
+  </action>
+  <action name="action_background">
+   <property name="icon">
+    <iconset>
+     <normaloff>../img/background.svg</normaloff>../img/background.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Add Background</string>
    </property>
   </action>
  </widget>

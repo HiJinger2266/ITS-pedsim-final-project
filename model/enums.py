@@ -22,9 +22,12 @@ class CursorMode(Enum):
     """
     CursorMode Enum
     """
-    PAN = 1
-    SELECT = 2
-    POINTER = 3
-    ADD = 4
-    DELETE = 5
-    EDIT = 6
+    ADD_BOUNDARY = 1
+    ADD_ORIGIN = 2
+    DELETE_LINE = 3
+    DELETE_POLYGON = 4
+    MOVE_LINE = 5
+    MOVE_POLYGON = 6
+    POINTER = 7
+    PAN = 8
+    ADD_DESTINATION = 9
