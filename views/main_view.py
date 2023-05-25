@@ -87,9 +87,9 @@ class MainView(QMainWindow):
         self._model.dark_mode_changed.connect(self.on_dark_mode_changed)
         self._model.cursor_mode_changed.connect(self.on_cursor_mode_changed)
         self._model.statusBar_message_changed.connect(lambda x: self.on_statusBar_message_changed(x))
-        self._model.boundaries_changed.connect(self.on_boundaries_changed)
-        self._model.origins_changed.connect(self.on_origins_changed)
-        self._model.destinations_changed.connect(self.on_destinations_changed)
+        self._model.boundaries_loaded.connect(self.on_boundaries_changed)
+        self._model.origins_loaded.connect(self.on_origins_loaded)
+        self._model.destinations_loaded.connect(self.on_destinations_changed)
 
 
         # connect menu items
@@ -108,6 +108,9 @@ class MainView(QMainWindow):
         self._ui.action_edit_road.setEnabled(False)
         self._ui.menuEdit_Geometry.setEnabled(False)
         self._ui.action_reload.setEnabled(False)
+        self._ui.action_start.setEnabled(False)
+        self._ui.action_pause.setEnabled(False)
+        self._ui.action_stop.setEnabled(False)
         
         if self._settings.value('dark_mode', type=bool) is None:
             self._settings.setValue('dark_mode', False)
@@ -118,7 +121,7 @@ class MainView(QMainWindow):
     @pyqtSlot(str)
     def on_simulation_file_path_changed(self, value):
         """
-        This slot is called when the simulation_file property of the model changes.
+        This slot is called when the simulation_file_path property of the model changes.
         """
         self._main_controller.set_statusBar_message('Simulation file loaded: {}'.format(value))
 
@@ -140,10 +143,13 @@ class MainView(QMainWindow):
             self._ui.action_edit_bound.setEnabled(True)
             self._ui.action_edit_origin.setEnabled(True)
             self._ui.action_edit_destination.setEnabled(True)
+            self._ui.action_start.setEnabled(True)
+            self._ui.action_pause.setEnabled(False)
+            self._ui.action_stop.setEnabled(False)
             # set title
-            self.setWindowTitle(f'PedSim - {self._model.simulation_file}')
-            # self._ui.statusbar.showMessage(f'{self._model.simulation_file}, last saved {QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")}')
-            self._main_controller.set_statusBar_message(f'{self._model.simulation_file}, last saved {QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")}')
+            self.setWindowTitle(f'PedSim - {self._model.simulation_file_path}')
+            # self._ui.statusbar.showMessage(f'{self._model.simulation_file_path}, last saved {QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")}')
+            self._main_controller.set_statusBar_message(f'{self._model.simulation_file_path}, last saved {QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")}')
         elif value == FileState.MODIFIED:
             # make actions available
             self._ui.action_close.setEnabled(True)
@@ -157,8 +163,11 @@ class MainView(QMainWindow):
             self._ui.action_edit_bound.setEnabled(True)
             self._ui.action_edit_origin.setEnabled(True)
             self._ui.action_edit_destination.setEnabled(True)
+            self._ui.action_start.setEnabled(True)
+            self._ui.action_pause.setEnabled(False)
+            self._ui.action_stop.setEnabled(False)
             # set title
-            self.setWindowTitle(f'PedSim - {self._model.simulation_file} *')
+            self.setWindowTitle(f'PedSim - {self._model.simulation_file_path} *')
 
         elif value == FileState.NEW:
             # make actions available
@@ -173,8 +182,11 @@ class MainView(QMainWindow):
             self._ui.action_edit_bound.setEnabled(True)
             self._ui.action_edit_origin.setEnabled(True)
             self._ui.action_edit_destination.setEnabled(True)
+            self._ui.action_start.setEnabled(True)
+            self._ui.action_pause.setEnabled(False)
+            self._ui.action_stop.setEnabled(False)
             # set title
-            self.setWindowTitle(f'PedSim - {self._model.simulation_file} *')
+            self.setWindowTitle(f'PedSim - {self._model.simulation_file_path} *')
 
         elif value == FileState.CLOSED:
             # make actions unavailable
@@ -189,6 +201,9 @@ class MainView(QMainWindow):
             self._ui.action_edit_bound.setEnabled(False)
             self._ui.action_edit_origin.setEnabled(False)
             self._ui.action_edit_destination.setEnabled(False)
+            self._ui.action_start.setEnabled(False)
+            self._ui.action_pause.setEnabled(False)
+            self._ui.action_stop.setEnabled(False)
             # set title
             self.setWindowTitle(f'PedSim')
 
@@ -207,11 +222,7 @@ class MainView(QMainWindow):
         """
         This slot is called when the user clicks the New Simulation menu item.
         """
-        # create temp file at user's temp directory
-        temp_folder = tempfile.gettempdir()
-        # make delete=True when done debugging
-        temp_file = tempfile.NamedTemporaryFile(suffix='.sim', dir=temp_folder, delete=False)
-        self._main_controller.open_temp_simulation_file(temp_file.name)
+        self._main_controller.new_simulation_file()
         
 
     @pyqtSlot(bool)
@@ -332,7 +343,7 @@ class MainView(QMainWindow):
         self._main_controller.set_statusBar_message('Boundaries changed.')
 
     @pyqtSlot()
-    def on_origins_changed(self):
+    def on_origins_loaded(self):
         """
         This slot is called when the origins property of the model changes.
         """

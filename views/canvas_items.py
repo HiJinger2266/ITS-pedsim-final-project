@@ -94,6 +94,9 @@ class PolygonItem(QtWidgets.QGraphicsPolygonItem):
         PolygonItem.ID += 1
         self.id_ = PolygonItem.ID
 
+    @classmethod
+    def from_file()
+
     def set_start_point(self, point):
         self.start_point = point
 
@@ -129,3 +132,15 @@ class PolygonItem(QtWidgets.QGraphicsPolygonItem):
         self.setPen(QtGui.QPen(QtGui.QColor(self.color), 2))
         self.setCursor(QtCore.Qt.ArrowCursor)
         super(PolygonItem, self).hoverLeaveEvent(event)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state_super = super(PolygonItem, self).__dict__.copy()
+        state_all = {**state, **state_super}
+        return state_all
+    
+    def __setstate__(self, state):
+        
+        self.__dict__.update(state)
+        super(PolygonItem, self).__init__(None)
+        super(PolygonItem, self).__dict__.update(state)

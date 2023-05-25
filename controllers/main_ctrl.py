@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from model.enums import FileState
 from model.main_model import MainModel
 import os
+import pickle
 
 class MainController(QObject):
     def __init__(self, model: MainModel):
@@ -19,23 +20,41 @@ class MainController(QObject):
         # validate file path
         if not os.path.isfile(value):
             raise FileNotFoundError(f'File not found: {value}')
+        # load simulation file to new model
+        with open(value, 'rb') as f:
+            data = pickle.load(f)
+            self._model.dark_mode = data['dark_mode']
+            self._model.boundaries = data['boundaries']
+            self._model.origins = data['origins']
+            self._model.destinations = data['destinations']
+            self._model.background = data['background']
         # set simulation file path
-        self._model.simulation_file = value
+        self._model.simulation_file_path = value
         # set simulation file status
         self._model.simulation_file_status = FileState.UNCHANGED
+        # status bar message
+        self._model.statusBar_message = f'Loaded simulation file: {value}'
 
     @pyqtSlot(bool)
-    def open_temp_simulation_file(self, value):
+    def new_simulation_file(self):
         """
-        connect with main_view action_open_temp_triggered
+        connect with main_view action_new_triggered
         """
-        # validate file path
-        if not os.path.isfile(value):
-            raise FileNotFoundError(f'File not found: {value}')
-        # set simulation file path
-        self._model.simulation_file = value
+        # check current simulation file status
+        if self._model.simulation_file_status == FileState.MODIFIED:
+            # ask for save
+            reply = QMessageBox.question(None, 'Save Simulation File', 'Do you want to save the current simulation file?', QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+            if reply == QMessageBox.Yes:
+                self.save_simulation_file()
+            elif reply == QMessageBox.Cancel:
+                return
+            elif reply == QMessageBox.No:
+                pass
         # set simulation file status
         self._model.simulation_file_status = FileState.NEW
+        self._model.dark_mode = self._settings.value('dark_mode', False, type=bool)
+        # status bar message
+        self._model.statusBar_message = 'New simulation'
         self.set_boundaries([])
         self.set_origins([])
         self.set_destinations([])
@@ -45,31 +64,33 @@ class MainController(QObject):
         """
         connect with main_view action_save_triggered
         """
-        # validate file path
-        if not os.path.isfile(self._model.simulation_file):
-            raise FileNotFoundError(f'File not found: {self._model.simulation_file}')
-        if self._model.simulation_file_status == FileState.NEW:
+        if self._model.simulation_file_path == '':
             # ask for new file path
             file_path, _ = QFileDialog.getSaveFileName(None, 'Save Simulation File', '', 'Simulation Files (*.sim);;All Files (*)')
             # validate file path
             if file_path:
-                with open(file_path, 'w') as f:
-                    f.write(QDateTime.currentDateTime().toString())
+                self._model.simulation_file_path = file_path
             else:
                 return
-            # set simulation file path
-            self._model.simulation_file = file_path
-            # set simulation file status
-        # TODO: save simulation file
-        pass
+        elif self._model.simulation_file_status == FileState.UNCHANGED:
+            return
+        # save simulation file
+        with open(self._model.simulation_file_path, 'wb') as f:
+            pickle.dump({
+                'dark_mode': self._model.dark_mode,
+                'boundaries': self._model.boundaries,
+                'origins': self._model.origins,
+                'destinations': self._model.destinations,
+                'background': self._model.background,
+            }, f)
         self._model.simulation_file_status = FileState.UNCHANGED
-        
+        # status bar message
+        self._model.statusBar_message = f'File saved: {self._model.simulation_file_path}, {QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")}'
 
     @pyqtSlot(bool)
     def toggle_dark_mode(self, value):
         self._model.dark_mode = not self._model.dark_mode
         self._settings.setValue('dark_mode', self._model.dark_mode)
-
 
     @pyqtSlot(bool)
     def set_cursor_mode(self, value):
@@ -82,15 +103,19 @@ class MainController(QObject):
     @pyqtSlot(bool)
     def set_boundaries(self, value):
         self._model.boundaries = value
+        self._model.simulation_file_status = FileState.MODIFIED
 
     @pyqtSlot(bool)
     def set_origins(self, value):
         self._model.origins = value
+        self._model.simulation_file_status = FileState.MODIFIED
 
     @pyqtSlot(bool)
     def set_destinations(self, value):
         self._model.destinations = value
+        self._model.simulation_file_status = FileState.MODIFIED
 
     @pyqtSlot(bool)
     def set_background(self, value):
         self._model.background = value
+        self._model.simulation_file_status = FileState.MODIFIED

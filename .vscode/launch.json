@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/main.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "preLaunchTask": "compile_ui"
+            "preLaunchTask": "compile_ui_and_update_packages"
         }
     ],
 }

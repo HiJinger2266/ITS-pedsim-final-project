@@ -64,37 +64,40 @@ class CanvasScene(QtWidgets.QGraphicsScene):
         self.destinations = []
         
         self.model.cursor_mode_changed.connect(self.set_current_mode)
-        self.model.boundaries_changed.connect(self.set_boundaries)
-        self.model.origins_changed.connect(self.set_origins)
-        self.model.destinations_changed.connect(self.set_destinations)
+        self.model.boundaries_loaded.connect(self.set_boundaries)
+        self.model.origins_loaded.connect(self.set_origins)
+        self.model.destinations_loaded.connect(self.set_destinations)
+        self.model.background_loaded.connect(self.set_background)
 
-    def set_boundaries(self, boundaries):
+    def set_boundaries(self):
         for boundary in self.boundaries:
             self.removeItem(boundary)
         self.boundaries = []
-        if boundaries is None:
+        if self.model.boundaries is None:
             return
+        boundaries = self.model.boundaries
         for boundary in boundaries:
-            self.boundaries.append(boundary)
-            self.addItem(boundary)
+            boundary_ = PolygonItem()
+            boundary_.update(boundary._points, boundary.color)
+            self.boundaries.append(boundary_)
 
-    def set_origins(self, origins):
+    def set_origins(self):
         for origin in self.origins:
             self.removeItem(origin)
         self.origins = []
-        if origins is None:
+        if self.model.origins is None:
             return
-        for origin in origins:
+        for origin in self.model.origins:
             self.origins.append(origin)
             self.addItem(origin)
 
-    def set_destinations(self, destinations):
+    def set_destinations(self):
         for destination in self.destinations:
             self.removeItem(destination)
         self.destinations = []
-        if destinations is None:
+        if self.model.destinations is None:
             return
-        for destination in destinations:
+        for destination in self.model.destinations:
             self.destinations.append(destination)
             self.addItem(destination)
 
@@ -139,7 +142,7 @@ class CanvasScene(QtWidgets.QGraphicsScene):
 
     def set_background(self, image_path):
         self.image_item.setPixmap(QtGui.QPixmap(image_path))
-        self.addItem(self.image_item)
+        # self.addItem(self.image_item)
         self.setSceneRect(self.image_item.boundingRect())
 
     def mousePressEvent(self, event):
@@ -157,6 +160,7 @@ class CanvasScene(QtWidgets.QGraphicsScene):
                     self.boundary = None
                 else:
                     self.boundary.add_point(event.scenePos())
+                    self.model.modify_boundaries(self.boundaries)
 
         elif self.current_mode == CursorMode.ADD_ORIGIN:
             if self.origin is None:

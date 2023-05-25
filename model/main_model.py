@@ -1,9 +1,8 @@
-from typing import List
 from PyQt5.QtCore import QObject, pyqtSignal
 import pandas as pd
+import pickle
 from model.enums import FileState, CursorMode
 from model.table_models import PolygonsTableModel
-from views.canvas_items import PolygonItem
 
 class MainModel(QObject):
     """
@@ -16,10 +15,10 @@ class MainModel(QObject):
     dark_mode_changed = pyqtSignal(bool)
     cursor_mode_changed = pyqtSignal(CursorMode)
     statusBar_message_changed = pyqtSignal(str)
-    boundaries_changed = pyqtSignal(list)
-    origins_changed = pyqtSignal(list)
-    destinations_changed = pyqtSignal(list)
-    background_changed = pyqtSignal()
+    boundaries_loaded = pyqtSignal()
+    origins_loaded = pyqtSignal()
+    destinations_loaded = pyqtSignal()
+    background_loaded = pyqtSignal(str)
 
     @property
     def simulation_file_path(self):
@@ -75,8 +74,13 @@ class MainModel(QObject):
     def boundaries(self, value):
         self._boundaries = value
         if value is not None:
-            self.boundaries_changed.emit(value)
+            self.boundaries_loaded.emit()
             self._boundaries_table_model.updateData(value)
+
+    def modify_boundaries(self, value):
+        self._boundaries = value
+        self._boundaries_table_model.updateData(value)
+
 
     @property
     def origins(self):
@@ -86,7 +90,7 @@ class MainModel(QObject):
     def origins(self, value):
         self._origins = value
         if value is not None:
-            self.origins_changed.emit(value)
+            self.origins_loaded.emit()
             self._origins_table_model.updateData(value)
 
     @property
@@ -97,7 +101,7 @@ class MainModel(QObject):
     def destinations(self, value):
         self._destinations = value
         if value is not None:
-            self.destinations_changed.emit(value)
+            self.destinations_loaded.emit()
             self._destinations_table_model.updateData(value)
 
     @property
@@ -119,7 +123,7 @@ class MainModel(QObject):
     @background.setter
     def background(self, value):
         self._background = value
-        self.background_changed.emit()
+        self.background_loaded.emit(value)
 
     def __init__(self):
         super().__init__()
@@ -136,4 +140,3 @@ class MainModel(QObject):
         self._origins_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
         self._destinations_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
         self._background = None
-
