@@ -69,24 +69,7 @@
       <iconset>
        <normaloff>../img/geometry.svg</normaloff>../img/geometry.svg</iconset>
      </property>
-     <widget class="QMenu" name="menuRoad">
-      <property name="title">
-       <string>Road</string>
-      </property>
-      <addaction name="action_edit_road"/>
-      <addaction name="action_add_road"/>
-      <addaction name="action_remove_road"/>
-     </widget>
-     <widget class="QMenu" name="menuBoundary">
-      <property name="title">
-       <string>Boundary</string>
-      </property>
-      <addaction name="action_edit_bound"/>
-      <addaction name="action_add_bound"/>
-      <addaction name="action_remove_bound"/>
-     </widget>
-     <addaction name="menuRoad"/>
-     <addaction name="menuBoundary"/>
+     <addaction name="action_edit_bound"/>
      <addaction name="action_edit_origin"/>
      <addaction name="action_edit_destination"/>
     </widget>
@@ -316,7 +299,7 @@
      <normaloff>../img/edit_boundary.svg</normaloff>../img/edit_boundary.svg</iconset>
    </property>
    <property name="text">
-    <string>Edit</string>
+    <string>Boundary</string>
    </property>
   </action>
   <action name="action_add_bound">

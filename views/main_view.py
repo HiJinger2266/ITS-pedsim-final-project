@@ -1,11 +1,12 @@
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QLabel
 from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime
-from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtGui import QKeySequence, QIcon
 from views.main_view_ui import Ui_MainWindow
 from views.signal_editor import SignalEditor
 from views.agents_editor import AgentsEditor
 from views.canvas import Canvas
+from views.canvas_items import AgentItem, PolygonItem
 from model.enums import FileState, CursorMode
 from model.main_model import MainModel
 from controllers.main_ctrl import MainController
@@ -23,6 +24,8 @@ class MainView(QMainWindow):
         self._main_controller = main_controller
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
+        self.mouse_coord_label = QLabel()
+        self._ui.statusbar.addPermanentWidget(self.mouse_coord_label)
         self._ui.tableView.setModel(self._model.boundaries_table_model)
         # change canvas
         del self._ui.canvas
@@ -87,10 +90,10 @@ class MainView(QMainWindow):
         self._model.dark_mode_changed.connect(self.on_dark_mode_changed)
         self._model.cursor_mode_changed.connect(self.on_cursor_mode_changed)
         self._model.statusBar_message_changed.connect(lambda x: self.on_statusBar_message_changed(x))
-        self._model.boundaries_loaded.connect(self.on_boundaries_changed)
-        self._model.origins_loaded.connect(self.on_origins_loaded)
-        self._model.destinations_loaded.connect(self.on_destinations_changed)
-
+        self._model.boundaries_changed.connect(self.on_boundaries_changed)
+        self._model.origins_changed.connect(self.on_origins_changed)
+        self._model.destinations_changed.connect(self.on_destinations_changed)
+        self._model.mouse_coord_changed.connect(self.on_mouse_coord_changed)
 
         # connect menu items
         self._ui.action_edit_signal.triggered.connect(self._edit_signal)
@@ -118,12 +121,16 @@ class MainView(QMainWindow):
         if self._settings.value('dark_mode', type=bool):
             self._main_controller.toggle_dark_mode(True)
 
+        # keyboard shortcuts
+        self._ui.action_save.setShortcut(QKeySequence('Ctrl+S'))
+
+
     @pyqtSlot(str)
     def on_simulation_file_path_changed(self, value):
         """
         This slot is called when the simulation_file_path property of the model changes.
         """
-        self._main_controller.set_statusBar_message('Simulation file loaded: {}'.format(value))
+        self._main_controller.set_statusBar_message('Simulation file changed: {}'.format(value))
 
     @pyqtSlot(FileState)
     def on_simulation_file_status_changed(self, value):
@@ -206,6 +213,7 @@ class MainView(QMainWindow):
             self._ui.action_stop.setEnabled(False)
             # set title
             self.setWindowTitle(f'PedSim')
+            print('File closed')
 
     @pyqtSlot()
     def on_action_open_triggered(self):
@@ -296,6 +304,13 @@ class MainView(QMainWindow):
         self._main_controller.save_simulation_file()  
 
     @pyqtSlot()
+    def on_action_close_triggered(self):
+        """
+        This slot is called when the user clicks the Close menu item.
+        """
+        self._main_controller.close_simulation_file()
+
+    @pyqtSlot()
     def on_action_edit_origin_triggered(self):
         self._main_controller.set_cursor_mode(CursorMode.ADD_ORIGIN)  
 
@@ -323,10 +338,8 @@ class MainView(QMainWindow):
             self._ui.canvas.setCursor(Qt.CursorShape.ForbiddenCursor)
         elif value == CursorMode.POINTER:
             self._ui.canvas.setCursor(Qt.CursorShape.ArrowCursor)
-            print('set cursor to pointer')
         elif value == CursorMode.ADD_BOUNDARY or value == CursorMode.ADD_ORIGIN or value == CursorMode.ADD_DESTINATION:
             self._ui.canvas.setCursor(Qt.CursorShape.CrossCursor)
-            print('set cursor to cross')
 
     @pyqtSlot()
     def on_statusBar_message_changed(self, value):
@@ -341,13 +354,15 @@ class MainView(QMainWindow):
         This slot is called when the boundaries property of the model changes.
         """
         self._main_controller.set_statusBar_message('Boundaries changed.')
+        self._ui.tableView.resizeColumnsToContents()
 
     @pyqtSlot()
-    def on_origins_loaded(self):
+    def on_origins_changed(self):
         """
         This slot is called when the origins property of the model changes.
         """
         self._main_controller.set_statusBar_message('Origins changed.')
+        self._ui.tableView.resizeColumnsToContents()
 
     @pyqtSlot()
     def on_destinations_changed(self):
@@ -355,6 +370,7 @@ class MainView(QMainWindow):
         This slot is called when the destinations property of the model changes.
         """
         self._main_controller.set_statusBar_message('Destinations changed.')
+        self._ui.tableView.resizeColumnsToContents()
 
     @pyqtSlot()
     def on_action_fit_triggered(self):
@@ -372,3 +388,24 @@ class MainView(QMainWindow):
         
         elif index == 2:
             self._ui.tableView.setModel(self._model.destinations_table_model)
+        self._ui.tableView.resizeColumnsToContents()
+
+    def on_mouse_coord_changed(self, point):
+        self.mouse_coord_label.setText(f'x: {int(point.x())}, y: {int(point.y())}')
+
+    def on_action_start_triggered(self):
+        # self._main_controller.start_simulation()
+        # test
+        if len(self._model.origins) == 0:
+            self._main_controller.set_statusBar_message('No origin defined.')
+            return
+        self.agents = []
+        for i in range(10):
+            agent = AgentItem()
+            origin = PolygonItem.from_dict(self._model.origins[0])
+            # random point inside origin
+            point = origin.random_point()
+            agent.setPos(point)
+            self._ui.canvas.scene().addItem(agent)
+            self.agents.append(agent)
+        print(self.agents)

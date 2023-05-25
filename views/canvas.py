@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QPointF, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsSceneWheelEvent
 from model.enums import CursorMode
 from model.main_model import MainModel
@@ -49,57 +50,50 @@ class CanvasScene(QtWidgets.QGraphicsScene):
     def __init__(self, parent=None, model: MainModel=None, controller: MainController=None):
         super(CanvasScene, self).__init__(parent)
         self.image_item = QtWidgets.QGraphicsPixmapItem()
+        self.image_item.setZValue(-1)
         ## for debugging
         self.image_item.setPixmap(QtGui.QPixmap())
         self.addItem(self.image_item)
         self.model = model
         self.controller = controller
-        self.current_mode = CursorMode.POINTER
-        # load line items and rect items
-        self.boundaries = []
-        self.origins = []
         self.boundary = None
         self.origin = None
         self.destination = None
+        self.boundaries = []
+        self.origins = []
         self.destinations = []
+        self.set_current_mode(self.model.cursor_mode)
         
         self.model.cursor_mode_changed.connect(self.set_current_mode)
-        self.model.boundaries_loaded.connect(self.set_boundaries)
-        self.model.origins_loaded.connect(self.set_origins)
-        self.model.destinations_loaded.connect(self.set_destinations)
-        self.model.background_loaded.connect(self.set_background)
+        self.model.file_loaded.connect(self.load_file)
+        
 
-    def set_boundaries(self):
+    def load_file(self):
+        self.image_item.setPixmap(QtGui.QPixmap(self.model.background))
+        self.setSceneRect(self.image_item.boundingRect())
         for boundary in self.boundaries:
             self.removeItem(boundary)
-        self.boundaries = []
-        if self.model.boundaries is None:
-            return
-        boundaries = self.model.boundaries
-        for boundary in boundaries:
-            boundary_ = PolygonItem()
-            boundary_.update(boundary._points, boundary.color)
-            self.boundaries.append(boundary_)
-
-    def set_origins(self):
         for origin in self.origins:
             self.removeItem(origin)
-        self.origins = []
-        if self.model.origins is None:
-            return
-        for origin in self.model.origins:
-            self.origins.append(origin)
-            self.addItem(origin)
-
-    def set_destinations(self):
         for destination in self.destinations:
             self.removeItem(destination)
+        self.boundaries = []
+        self.origins = []
         self.destinations = []
-        if self.model.destinations is None:
-            return
+        for boundary in self.model.boundaries:
+            boundary_ = PolygonItem.from_dict(boundary)
+            self.addItem(boundary_)
+            self.boundaries.append(boundary_)
+        for origin in self.model.origins:
+            origin_ = PolygonItem.from_dict(origin)
+            self.addItem(origin_)
+            self.origins.append(origin_)
         for destination in self.model.destinations:
-            self.destinations.append(destination)
-            self.addItem(destination)
+            destination_ = PolygonItem.from_dict(destination)
+            self.addItem(destination_)
+            self.destinations.append(destination_)
+
+        self.set_current_mode(self.model.cursor_mode)
 
     def set_current_mode(self, mode):
         self.current_mode = mode
@@ -160,7 +154,7 @@ class CanvasScene(QtWidgets.QGraphicsScene):
                     self.boundary = None
                 else:
                     self.boundary.add_point(event.scenePos())
-                    self.model.modify_boundaries(self.boundaries)
+                    self.controller.set_boundaries(self.boundaries)
 
         elif self.current_mode == CursorMode.ADD_ORIGIN:
             if self.origin is None:
@@ -195,6 +189,7 @@ class CanvasScene(QtWidgets.QGraphicsScene):
         return super(CanvasScene, self).mousePressEvent(event)
     
     def mouseMoveEvent(self, event):
+        self.model.mouse_coord_scene = event.scenePos()
         if self.current_mode == CursorMode.ADD_BOUNDARY:
             if self.boundary is not None:
                 self.boundary.set_end_point(event.scenePos(), temp=True)

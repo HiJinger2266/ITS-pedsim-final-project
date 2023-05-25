@@ -1,6 +1,5 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QPointF
 import pandas as pd
-import pickle
 from model.enums import FileState, CursorMode
 from model.table_models import PolygonsTableModel
 
@@ -15,10 +14,12 @@ class MainModel(QObject):
     dark_mode_changed = pyqtSignal(bool)
     cursor_mode_changed = pyqtSignal(CursorMode)
     statusBar_message_changed = pyqtSignal(str)
-    boundaries_loaded = pyqtSignal()
-    origins_loaded = pyqtSignal()
-    destinations_loaded = pyqtSignal()
-    background_loaded = pyqtSignal(str)
+    file_loaded = pyqtSignal()
+    boundaries_changed = pyqtSignal()
+    origins_changed = pyqtSignal()
+    destinations_changed = pyqtSignal()
+    background_changed = pyqtSignal()
+    mouse_coord_changed = pyqtSignal(QPointF)
 
     @property
     def simulation_file_path(self):
@@ -55,7 +56,7 @@ class MainModel(QObject):
     def cursor_mode(self, value):
         self._cursor_mode = value
         self.cursor_mode_changed.emit(value)
-        print('cursor_mode changed', value)
+
 
     @property
     def statusBar_message(self):
@@ -74,13 +75,8 @@ class MainModel(QObject):
     def boundaries(self, value):
         self._boundaries = value
         if value is not None:
-            self.boundaries_loaded.emit()
+            self.boundaries_changed.emit()
             self._boundaries_table_model.updateData(value)
-
-    def modify_boundaries(self, value):
-        self._boundaries = value
-        self._boundaries_table_model.updateData(value)
-
 
     @property
     def origins(self):
@@ -90,7 +86,7 @@ class MainModel(QObject):
     def origins(self, value):
         self._origins = value
         if value is not None:
-            self.origins_loaded.emit()
+            self.origins_changed.emit()
             self._origins_table_model.updateData(value)
 
     @property
@@ -101,7 +97,7 @@ class MainModel(QObject):
     def destinations(self, value):
         self._destinations = value
         if value is not None:
-            self.destinations_loaded.emit()
+            self.destinations_changed.emit()
             self._destinations_table_model.updateData(value)
 
     @property
@@ -123,20 +119,41 @@ class MainModel(QObject):
     @background.setter
     def background(self, value):
         self._background = value
-        self.background_loaded.emit(value)
+        self.background_changed.emit()
+
+    @property
+    def loaded(self):
+        return self._loaded
+    
+    @loaded.setter
+    def loaded(self, value):
+        self._loaded = value
+        self.file_loaded.emit()
+
+    @property
+    def mouse_coord_scene(self):    
+        return self._mouse_coord_scene
+
+    @mouse_coord_scene.setter
+    def mouse_coord_scene(self, value):
+        self._mouse_coord_scene = value
+        self.mouse_coord_changed.emit(value)
 
     def __init__(self):
         super().__init__()
-        self._geometry_file = None
         self._simulation_file_path = ''
         self._dark_mode = False
         self._simulation_file_status = FileState.UNCHANGED
         self._cursor_mode = CursorMode.POINTER
         self._statusBar_message = 'Ready'
-        self._boundaries = None
-        self._origins = None
-        self._destinations = None
+        self._loaded = False
+
+        self._boundaries = {}
+        self._origins = {}
+        self._destinations = {}
         self._boundaries_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
         self._origins_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
         self._destinations_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
-        self._background = None
+        self._background = ''
+
+        self.mouse_coord_scene = QPointF(0, 0)

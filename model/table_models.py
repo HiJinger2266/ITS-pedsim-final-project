@@ -1,4 +1,3 @@
-import typing
 import pandas as pd
 from PyQt5.QtCore import QAbstractTableModel, QObject, QModelIndex, Qt
 
@@ -54,7 +53,7 @@ class PolygonsTableModel(DataFrameTableModel):
         self.beginResetModel()
         df = pd.DataFrame(columns=['id', 'points'])
         for i, o in enumerate(polygon):
-            df.loc[i] = [o.id_, o.points]
+            df.loc[i] = [o['id'], o['points']]
         self._data = df
         # update the view
         self.endResetModel()

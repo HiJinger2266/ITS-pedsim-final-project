@@ -31,3 +31,12 @@ class CursorMode(Enum):
     POINTER = 7
     PAN = 8
     ADD_DESTINATION = 9
+
+class DistType(Enum):
+    """
+    Distribution Enum
+    """
+    UNIFORM = 1
+    POISSON = 2
+    NORMAL = 3
+    EXPONENTIAL = 4
