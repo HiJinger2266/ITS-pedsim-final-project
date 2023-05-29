@@ -28,7 +28,9 @@ class MainController(QObject):
             self._model.boundaries = data['boundaries']
             self._model.origins = data['origins']
             self._model.destinations = data['destinations']
-            self._model.background = data['background']
+            # change background to absolute path
+            if data['background'] != '':
+                self._model.background = os.path.abspath(data['background'])
 
         # set simulation file path
         self._model.simulation_file_path = value
@@ -81,6 +83,11 @@ class MainController(QObject):
                 return
         elif self._model.simulation_file_status == FileState.UNCHANGED:
             return
+        
+        # change background to relative path
+        if self._model.background != '':
+            self._model.background = os.path.relpath(self._model.background, os.path.dirname(self._model.simulation_file_path))
+        print(self._model.background)
 
         # save simulation file
         with open(self._model.simulation_file_path, 'w') as f:
