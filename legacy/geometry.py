@@ -1,4 +1,6 @@
-class Zone: (x1, y1)
+class Zone:
+    def 
+    (x1, y1)
     pass
 
 class PedCrossing(Zone):    # 行人穿越線
@@ -8,7 +10,11 @@ class BikeCrossing(Zone):   # 自行車穿越線
     pass
 
 class Sidewalk(Zone):       # 人行道，人車共道
-    pass
+    def __init__(self):
+        pass
+    
+    def accommodate(self, agent):
+        zone
 
 class RoadLane(Zone):       # 車道
     pass
