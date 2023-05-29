@@ -407,7 +407,7 @@ class MainView(QMainWindow):
             if self.isPaused:
                 self.isPaused = False
                 self._ui.action_pause.setEnabled(True)
-                self.timer.start(self.time_step*1000)
+                self.timer.start(int(self.time_step*1000))
                 return
 
         self.time_step = 0.1
@@ -430,7 +430,7 @@ class MainView(QMainWindow):
         # update every 0.1 second    
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_simulation)
-        self.timer.start(self.time_step * 1000)
+        self.timer.start(int(self.time_step * 1000))
         self._main_controller.set_statusBar_message('Simulation started.')
 
     def update_simulation(self):
