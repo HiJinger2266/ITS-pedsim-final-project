@@ -34,10 +34,10 @@ def SocialForce(agent):
 
 # Driving force toward destination
 def ForceDriving(agent):
-    tau_alpha = agent.relax_time_sec()            # Scalar
-    e_alpha_vec = agent.unit_target_vec()     # Vector
-    desire_speed = agent.desired_speed_mps()      # Scalar
-    current_speed_vec = agent.speed_mps()        # Vector
+    tau_alpha = agent.relax_time_s              # 休息時間 is Scalar
+    e_alpha_vec = agent.unit_target_vec         # 單位目標向量 is Vector
+    desire_speed = agent.desired_speed_mps      # 期望速度純量 is Scalar
+    current_speed_vec = agent.velocity_vec      # 速度向量 is Vector
     f_x = (desire_speed * e_alpha_vec[0] - current_speed_vec[0]) / tau_alpha
     f_y = (desire_speed * e_alpha_vec[1] - current_speed_vec[1]) / tau_alpha
     return [f_x, f_y] 
