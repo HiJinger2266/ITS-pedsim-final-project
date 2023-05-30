@@ -10,7 +10,7 @@ class Canvas(QtWidgets.QGraphicsView):
 
     factor = 1.25
 
-    def __init__(self, parent=None, model=None, controller=None):
+    def __init__(self, parent=None, model=None, controller:MainController =None):
         super(Canvas, self).__init__(parent)
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
         self.setMouseTracking(True)
@@ -19,6 +19,7 @@ class Canvas(QtWidgets.QGraphicsView):
         self.setScene(CanvasScene(self, model, controller))
         self.model = model
         self.controller = controller
+        self.setAcceptDrops(True)
 
         self.model.cursor_mode_changed.connect(self.set_cursor_mode)
 
@@ -67,6 +68,27 @@ class CanvasScene(QtWidgets.QGraphicsScene):
         self.model.cursor_mode_changed.connect(self.set_current_mode)
         self.model.file_loaded.connect(self.load_file)
         
+
+    def dragMoveEvent(self, event):
+        # Overriding default dragMoveEvent in order to accept drops without items under them
+        pass
+        
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+    
+    def dropEvent(self, event):
+        for url in event.mimeData().urls():
+            file_name = url.toLocalFile()
+            if file_name.endswith('.sim'):
+                self.controller.open_simulation_file(file_name)
+            elif file_name.endswith('.png'):
+                self.controller.set_background(file_name)
+                self.set_background(file_name)
+            else:
+                print('Unsupported file type.', file_name)
 
     def load_file(self):
         self.image_item.setPixmap(QtGui.QPixmap(self.model.background))

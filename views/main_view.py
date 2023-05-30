@@ -461,3 +461,5 @@ class MainView(QMainWindow):
         self._main_controller.set_statusBar_message('Simulation stopped.')
         for agent in self.agents:
             self._ui.canvas.scene().removeItem(agent)
+        if hasattr(self, 'isPaused'):
+            del self.isPaused
