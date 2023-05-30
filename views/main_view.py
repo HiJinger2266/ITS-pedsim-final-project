@@ -12,7 +12,7 @@ from controllers.main_ctrl import MainController
 import qdarkstyle
 import tempfile
 import os, sys
-from ctypes import windll, byref, sizeof, c_int
+
 
 IMG_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'resources', 'img')
 
@@ -249,6 +249,7 @@ class MainView(QMainWindow):
             # self._ui.action_toggle_dark_mode.setIcon(QIcon(os.path.join(IMG_FOLDER, 'dark_mode_alt.svg')))
             # if windows:
             if sys.platform == 'win32':
+                from ctypes import windll, byref, sizeof, c_int
                 # set window title bar color
                 HWND = self.winId().__int__()
                 DWMWA_ATTRIBUTE = 35
@@ -263,6 +264,7 @@ class MainView(QMainWindow):
             # self._ui.action_toggle_dark_mode.setText('Dark Mode')
             # self._ui.action_toggle_dark_mode.setIcon(QIcon(os.path.join(IMG_FOLDER, 'dark_mode.svg')))
             if sys.platform == 'win32':
+                from ctypes import windll, byref, sizeof, c_int
                 # set window title bar color
                 HWND = self.winId().__int__()
                 DWMWA_ATTRIBUTE = 35

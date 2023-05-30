@@ -31,6 +31,8 @@ class MainController(QObject):
             # change background to absolute path
             if data['background'] != '':
                 self._model.background = os.path.abspath(data['background'])
+            else:
+                self._model.background = ''
 
         # set simulation file path
         self._model.simulation_file_path = value
