@@ -2,6 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, QSettings, QDateTime
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from model.enums import FileState
 from model.main_model import MainModel
+from model.sim_model import SimModel
 from views.canvas_items import PolygonItem
 import os
 import json
@@ -27,7 +28,11 @@ class MainController(QObject):
             self._model.boundaries = data['boundaries']
             self._model.origins = data['origins']
             self._model.destinations = data['destinations']
-            self._model.background = data['background']
+            # change background to absolute path
+            if data['background'] != '':
+                self._model.background = os.path.abspath(data['background'])
+            else:
+                self._model.background = ''
 
         # set simulation file path
         self._model.simulation_file_path = value
@@ -80,6 +85,11 @@ class MainController(QObject):
                 return
         elif self._model.simulation_file_status == FileState.UNCHANGED:
             return
+        
+        # change background to relative path
+        if self._model.background != '':
+            self._model.background = os.path.relpath(self._model.background, os.path.dirname(self._model.simulation_file_path))
+        print(self._model.background)
 
         # save simulation file
         with open(self._model.simulation_file_path, 'w') as f:
@@ -170,4 +180,7 @@ class MainController(QObject):
         self._model.background = value
         self._model.simulation_file_status = FileState.MODIFIED
 
-    
+    @pyqtSlot(bool)
+    def start_simulation(self):
+        # 
+        pass

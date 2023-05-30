@@ -1,6 +1,5 @@
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QLabel
-from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime
+from PyQt5.QtCore import pyqtSlot, QSettings, Qt, QDateTime, QTimer
 from PyQt5.QtGui import QKeySequence, QIcon
 from views.main_view_ui import Ui_MainWindow
 from views.signal_editor import SignalEditor
@@ -13,7 +12,7 @@ from controllers.main_ctrl import MainController
 import qdarkstyle
 import tempfile
 import os, sys
-from ctypes import windll, byref, sizeof, c_int
+
 
 IMG_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'resources', 'img')
 
@@ -24,6 +23,8 @@ class MainView(QMainWindow):
         self._main_controller = main_controller
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
+        self.simulation_time_label = QLabel()
+        self._ui.statusbar.addPermanentWidget(self.simulation_time_label)
         self.mouse_coord_label = QLabel()
         self._ui.statusbar.addPermanentWidget(self.mouse_coord_label)
         self._ui.tableView.setModel(self._model.boundaries_table_model)
@@ -98,6 +99,9 @@ class MainView(QMainWindow):
         # connect menu items
         self._ui.action_edit_signal.triggered.connect(self._edit_signal)
         self._ui.action_edit_agents.triggered.connect(self._edit_agents)
+        self._ui.action_start.triggered.connect(self._start)
+        self._ui.action_pause.triggered.connect(self._pause)
+        self._ui.action_stop.triggered.connect(self._stop)
 
         ## set initial state
         self._ui.action_close.setEnabled(False)
@@ -245,6 +249,7 @@ class MainView(QMainWindow):
             # self._ui.action_toggle_dark_mode.setIcon(QIcon(os.path.join(IMG_FOLDER, 'dark_mode_alt.svg')))
             # if windows:
             if sys.platform == 'win32':
+                from ctypes import windll, byref, sizeof, c_int
                 # set window title bar color
                 HWND = self.winId().__int__()
                 DWMWA_ATTRIBUTE = 35
@@ -259,6 +264,7 @@ class MainView(QMainWindow):
             # self._ui.action_toggle_dark_mode.setText('Dark Mode')
             # self._ui.action_toggle_dark_mode.setIcon(QIcon(os.path.join(IMG_FOLDER, 'dark_mode.svg')))
             if sys.platform == 'win32':
+                from ctypes import windll, byref, sizeof, c_int
                 # set window title bar color
                 HWND = self.winId().__int__()
                 DWMWA_ATTRIBUTE = 35
@@ -393,14 +399,25 @@ class MainView(QMainWindow):
     def on_mouse_coord_changed(self, point):
         self.mouse_coord_label.setText(f'x: {int(point.x())}, y: {int(point.y())}')
 
-    def on_action_start_triggered(self):
+    def _start(self):
         # self._main_controller.start_simulation()
         # test
         if len(self._model.origins) == 0:
             self._main_controller.set_statusBar_message('No origin defined.')
             return
+        if hasattr(self,'isPaused'):
+            if self.isPaused:
+                self.isPaused = False
+                self._ui.action_pause.setEnabled(True)
+                self.timer.start(int(self.time_step*1000))
+                return
+
+        self.time_step = 0.1
+        self.current_step = 0
+        self.num_steps = 100
+        self.simulation_time_label.setText(f'Simulation time: {self.current_step}')
         self.agents = []
-        for i in range(10):
+        for i in range(20):
             agent = AgentItem()
             origin = PolygonItem.from_dict(self._model.origins[0])
             # random point inside origin
@@ -408,4 +425,39 @@ class MainView(QMainWindow):
             agent.setPos(point)
             self._ui.canvas.scene().addItem(agent)
             self.agents.append(agent)
-        print(self.agents)
+
+        self._ui.action_pause.setEnabled(True)
+        self._ui.action_start.setEnabled(False)
+        self._ui.action_stop.setEnabled(True)
+        # update every 0.1 second    
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_simulation)
+        self.timer.start(int(self.time_step * 1000))
+        self._main_controller.set_statusBar_message('Simulation started.')
+
+    def update_simulation(self):
+        for agent in self.agents:
+            # agent.setPos(agent.pos() + QPointF(1, 0))
+            agent.move_to_destination(self._model.destinations[0])
+        self.simulation_time_label.setText(f'Simulation time: {self.current_step * self.time_step:.2f}')
+        self.current_step += 1
+        if self.current_step > self.num_steps:
+            self._stop()
+            self._main_controller.set_statusBar_message('Simulation finished.')
+
+    def _pause(self):
+        self.timer.stop()
+        self._ui.action_pause.setEnabled(False)
+        self._ui.action_start.setEnabled(True)
+        self._ui.action_stop.setEnabled(True)
+        self._main_controller.set_statusBar_message('Simulation paused.')
+        self.isPaused = True
+
+    def _stop(self):
+        self.timer.stop()
+        self._ui.action_pause.setEnabled(False)
+        self._ui.action_start.setEnabled(True)
+        self._ui.action_stop.setEnabled(False)
+        self._main_controller.set_statusBar_message('Simulation stopped.')
+        for agent in self.agents:
+            self._ui.canvas.scene().removeItem(agent)

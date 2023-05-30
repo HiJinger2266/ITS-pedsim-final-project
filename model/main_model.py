@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal, QPointF
-import pandas as pd
+# import pandas as pd
 from model.enums import FileState, CursorMode
 from model.table_models import PolygonsTableModel
 
@@ -151,9 +151,9 @@ class MainModel(QObject):
         self._boundaries = {}
         self._origins = {}
         self._destinations = {}
-        self._boundaries_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
-        self._origins_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
-        self._destinations_table_model = PolygonsTableModel(pd.DataFrame(columns=['id', 'points']))
+        self._boundaries_table_model = PolygonsTableModel()
+        self._origins_table_model = PolygonsTableModel()
+        self._destinations_table_model = PolygonsTableModel()
         self._background = ''
 
         self.mouse_coord_scene = QPointF(0, 0)

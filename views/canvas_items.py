@@ -1,4 +1,5 @@
 import random
+import math
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QStyle
 
@@ -219,3 +220,45 @@ class AgentItem(QtWidgets.QGraphicsEllipseItem):
         self.id_ = AgentItem.ID
         self.radius = 5
         self.setRect(QtCore.QRectF(-self.radius, -self.radius, 2*self.radius, 2*self.radius))
+        self.speed = 7
+        self.dest = None
+        self.dest_point = None
+
+    def move_to_destination(self, destination):
+        """
+        moving towards the destination
+        """
+        if self.dest is None:
+            self.dest = QtGui.QPolygonF()
+            for point in destination['points']:
+                self.dest.append(QtCore.QPointF(float(point['x']), float(point['y'])))
+        
+        # move towards the destination
+        if self.dest.containsPoint(self.pos(), QtCore.Qt.OddEvenFill):
+            self.setVisible(False)
+            return True
+        else:
+            if self.dest_point is None:
+                self.dest_point = self.random_point(self.dest)
+            # direction vector
+            direction = self.dest_point - self.pos()
+            # length of the direction vector
+            length = math.sqrt(direction.x()**2 + direction.y()**2)
+            # normalize the direction vector
+            direction = direction / length
+            # move the agent
+            self.setPos(self.pos() + direction * self.speed)
+            return False
+        
+    def random_point(self, polygon):
+        """
+        return a random point inside the polygon
+        """
+        x_min, x_max = polygon.boundingRect().left(), polygon.boundingRect().right()
+        y_min, y_max = polygon.boundingRect().top(), polygon.boundingRect().bottom()
+        while True:
+            x = random.uniform(x_min, x_max)
+            y = random.uniform(y_min, y_max)
+            point = QtCore.QPointF(x, y)
+            if polygon.containsPoint(point, QtCore.Qt.OddEvenFill):
+                return point

@@ -6,11 +6,11 @@ class SimModel(QObject):
     ped_dist_changed = pyqtSignal(DistType)
     ped_dist_params_changed = pyqtSignal(list)
 
-    def __init__(self):
-        super().__init__()
-        self._boundaries = []
-        self._origins = []
-        self._destinations = []
+    def __init__(self, boundaries, origins, destinations, parent=None):
+        super().__init__(parent=parent)
+        self._boundaries = boundaries
+        self._origins = origins
+        self._destinations = destinations
         self._pedestrians = []
         self._ped_dist = DistType.POISSON
         self._ped_dist_params = [30]
