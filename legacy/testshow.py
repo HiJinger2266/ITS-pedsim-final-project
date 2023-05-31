@@ -1,4 +1,5 @@
 from tkinter import *
+import numpy as np
 import time
 import datetime
 import agent
@@ -8,18 +9,24 @@ agents = []
 dots = []
 
 def AgentCreater():
-    agents.append(agent.Agent(startpoint=[18,30],endpoint=[425,66]))
+    x0 = np.random.uniform(200,250)
+    y0 = np.random.uniform(100,150)
+    x1 = np.random.uniform(400,450)
+    y1 = np.random.uniform(250,300)
+    agents.append(agent.Agent(startpoint=[x0,y0],endpoint=[x1,y1]))
     dots.append(canva.create_oval(agents[-1].position_vec[0]-5,agents[-1].position_vec[1]-5,
                                   agents[-1].position_vec[0]+5,agents[-1].position_vec[1]+5, fill="black"))
         
 def MoveOneStep(e):
-    for i in range(len(agents)):
-        agents[i].update()
     for j in range(len(agents)):
+        agents[j].update()
         canva.moveto(dots[j], agents[j].position_vec[0], agents[j].position_vec[1])
         if agents[j].check_arrival() == True:
-            del dots[j]
-            del agents[j]
+            canva.delete(dots[j])
+    for i in range(len(agents)):
+        if agents[i].check_arrival() == True:
+            del dots[i]
+            del agents[i]
 
 window = Tk()
 window.title("Test Agent")

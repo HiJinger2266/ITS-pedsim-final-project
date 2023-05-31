@@ -3,7 +3,7 @@ import pandas as pd
 import socialforce as scf
 
 global timestep_s
-timestep_s = 0.5    # 全域使用時間間隔 0.5 秒
+timestep_s = 1    # 全域使用時間間隔 1 秒
 
 # Matplotlib 直接點點點
 
